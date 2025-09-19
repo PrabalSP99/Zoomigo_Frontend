@@ -1,0 +1,401 @@
+# Enhanced GraphQL Schema for BadhoSa
+# Add these to your existing schema
+
+scalar Date
+scalar DateTime
+scalar JSON
+
+# ---------------------------
+# ENUMS (existing)
+# ---------------------------
+enum DriveMode {
+  MANUAL
+  AUTOMATIC
+}
+
+enum AvailabilityStatus {
+  AVAILABLE
+  UNAVAILABLE
+  MAINTENANCE
+}
+
+enum VehicleType {
+  CAR
+  BIKE
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  REFUNDED
+}
+
+enum PaymentMethod {
+  CREDIT_CARD
+  DEBIT_CARD
+  UPI
+  NET_BANKING
+  CASH
+}
+
+# ---------------------------
+# INPUT TYPES (NEW - Add these)
+# ---------------------------
+
+input VehicleFilters {
+  type: VehicleType
+  brand: String
+  priceRange: PriceRangeInput
+  location: LocationInput
+  availability: AvailabilityInput
+  featured: Boolean
+  first: Int
+  after: String
+}
+
+input PriceRangeInput {
+  min: Float
+  max: Float
+}
+
+input LocationInput {
+  city: String
+  lat: Float
+  lon: Float
+  radius: Float
+  address: String
+  state: String
+  country: String
+}
+
+input AvailabilityInput {
+  startTime: DateTime!
+  endTime: DateTime!
+}
+
+input RegisterUserInput {
+  name: String!
+  email: String!
+  password: String!
+  phone: String
+  DOB: Date
+}
+
+input LoginUserInput {
+  email: String!
+  password: String!
+}
+
+input CreateBookingInput {
+  vehicleId: ID!
+  userId: ID!
+  startTime: DateTime!
+  endTime: DateTime!
+  locationDetail: LocationInput!
+  totalAmount: Float!
+}
+
+input UpdateBookingInput {
+  startTime: DateTime
+  endTime: DateTime
+  locationDetail: LocationInput
+  totalAmount: Float
+}
+
+input CreatePaymentInput {
+  bookingId: ID!
+  amount: Float!
+  method: PaymentMethod!
+  metadata: JSON
+}
+
+input UpdatePaymentInput {
+  status: PaymentStatus
+  metadata: JSON
+}
+
+input CreateReviewInput {
+  bookingId: ID!
+  userId: ID!
+  rating: Float!
+  comment: String
+}
+
+input UpdateReviewInput {
+  rating: Float
+  comment: String
+}
+
+input UpdateUserInput {
+  name: String
+  email: String
+  phone: String
+  DOB: Date
+}
+
+input ChangePasswordInput {
+  userId: ID!
+  currentPassword: String!
+  newPassword: String!
+}
+
+# ---------------------------
+# TYPES (existing + enhanced)
+# ---------------------------
+
+type User {
+  id: ID!
+  name: String!
+  DOB: Date
+  email: String!
+  phone: String
+  createdAt: DateTime!
+  bookings(first: Int, after: String, filters: BookingFilters): BookingConnection
+}
+
+type Vehicle {
+  id: ID!
+  type: VehicleType!
+  brand: String
+  model: String
+  engineSpec: Engine!
+  year: Int
+  licensePlate: String
+  location: Location!
+  pricing: Pricing!
+  availabilityStatus: AvailabilityStatus!
+  createdAt: DateTime!
+  reviews(first: Int, after: String): ReviewConnection
+  images: [VehicleImage!]
+  featured: Boolean
+}
+
+type VehicleImage {
+  id: ID!
+  url: String!
+  altText: String
+  isPrimary: Boolean!
+  vehicle: Vehicle!
+}
+
+type Engine {
+  displacement: String!
+  topSpeed: String!
+  fuelCapacity: String!
+  seats: Int!
+  mileage: String!
+  kerbWeight: String
+  driveMode: DriveMode!
+  fuelType: String!
+}
+
+type Pricing {
+  perHour: Float
+  perDay: Float
+  perWeek: Float
+  perKm: Float
+}
+
+type Location {
+  city: String!
+  lat: Float
+  lon: Float
+  address: String
+  state: String
+  country: String
+  raw: JSON
+}
+
+type Booking {
+  id: ID!
+  vehicle: Vehicle!
+  user: User!
+  locationDetail: Location!
+  startTime: DateTime!
+  endTime: DateTime!
+  status: BookingStatus!
+  totalAmount: Float!
+  createdAt: DateTime!
+  payment: Payment
+  review: Review
+}
+
+type Payment {
+  id: ID!
+  booking: Booking!
+  transactionId: String
+  amount: Float!
+  status: PaymentStatus!
+  method: PaymentMethod
+  createdAt: DateTime!
+  metadata: JSON
+}
+
+type Review {
+  id: ID!
+  booking: Booking!
+  user: User!
+  rating: Float!
+  comment: String
+  createdAt: DateTime!
+}
+
+# ---------------------------
+# CONNECTION TYPES (for pagination)
+# ---------------------------
+
+type VehicleConnection {
+  edges: [VehicleEdge!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+type VehicleEdge {
+  node: Vehicle!
+  cursor: String!
+}
+
+type BookingConnection {
+  edges: [BookingEdge!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+type BookingEdge {
+  node: Booking!
+  cursor: String!
+}
+
+type ReviewConnection {
+  edges: [ReviewEdge!]!
+  pageInfo: PageInfo!
+  totalCount: Int!
+}
+
+type ReviewEdge {
+  node: Review!
+  cursor: String!
+}
+
+type PageInfo {
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+  startCursor: String
+  endCursor: String
+}
+
+# ---------------------------
+# RESPONSE TYPES
+# ---------------------------
+
+type AuthResponse {
+  user: User!
+  token: String!
+  refreshToken: String!
+}
+
+type AvailabilityResponse {
+  available: Boolean!
+  conflictingBookings: [Booking!]
+}
+
+type PasswordChangeResponse {
+  success: Boolean!
+  message: String!
+}
+
+# ---------------------------
+# QUERIES (Add these to your schema)
+# ---------------------------
+
+type Query {
+  # Vehicle queries
+  vehicles(filters: VehicleFilters): VehicleConnection!
+  vehicle(id: ID!): Vehicle
+  
+  # User queries
+  user(id: ID!): User
+  me: User
+  
+  # Booking queries
+  booking(id: ID!): Booking
+  bookings(filters: BookingFilters): BookingConnection!
+  
+  # Availability queries
+  checkVehicleAvailability(vehicleId: ID!, startTime: DateTime!, endTime: DateTime!): AvailabilityResponse!
+  
+  # Review queries
+  reviews(filters: ReviewFilters): ReviewConnection!
+  review(id: ID!): Review
+}
+
+# ---------------------------
+# MUTATIONS (Add these to your schema)
+# ---------------------------
+
+type Mutation {
+  # Authentication
+  registerUser(input: RegisterUserInput!): AuthResponse!
+  loginUser(input: LoginUserInput!): AuthResponse!
+  logoutUser: Boolean!
+  refreshToken(token: String!): AuthResponse!
+  
+  # User management
+  updateUser(id: ID!, input: UpdateUserInput!): User!
+  changePassword(input: ChangePasswordInput!): PasswordChangeResponse!
+  
+  # Booking management
+  createBooking(input: CreateBookingInput!): Booking!
+  updateBooking(id: ID!, input: UpdateBookingInput!): Booking!
+  cancelBooking(id: ID!): Booking!
+  
+  # Payment management
+  createPayment(input: CreatePaymentInput!): Payment!
+  updatePayment(id: ID!, input: UpdatePaymentInput!): Payment!
+  
+  # Review management
+  createReview(input: CreateReviewInput!): Review!
+  updateReview(id: ID!, input: UpdateReviewInput!): Review!
+  deleteReview(id: ID!): Boolean!
+}
+
+# ---------------------------
+# SUBSCRIPTIONS (Add these for real-time features)
+# ---------------------------
+
+type Subscription {
+  bookingStatusChanged(userId: ID!): Booking!
+  paymentStatusChanged(userId: ID!): Payment!
+  vehicleAvailabilityChanged(vehicleId: ID!): Vehicle!
+}
+
+# ---------------------------
+# ADDITIONAL INPUT TYPES
+# ---------------------------
+
+input BookingFilters {
+  status: BookingStatus
+  userId: ID
+  vehicleId: ID
+  startDate: DateTime
+  endDate: DateTime
+  first: Int
+  after: String
+}
+
+input ReviewFilters {
+  vehicleId: ID
+  userId: ID
+  minRating: Float
+  maxRating: Float
+  first: Int
+  after: String
+}
