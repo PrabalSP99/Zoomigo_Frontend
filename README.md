@@ -1,4 +1,4 @@
-# BadhoSa Frontend
+# Zoomigo Frontend
 
 This is the frontend for BadhoSa (Vehicle Rentals) built with Next.js and Apollo Client for GraphQL integration.
 
