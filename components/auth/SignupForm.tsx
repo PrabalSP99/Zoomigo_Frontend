@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation'; // ✅ Next.js App Router
-import { Button, Input, Card, CardHeader, CardBody } from '../ui';
+import { Card, CardHeader, CardBody, Input } from '../ui';
 import { CREATE_USER } from '../../lib/graphql';
 import { useMutation } from '@apollo/client';
 import { STRINGS } from '../../constants/StringConstant';
@@ -13,7 +13,7 @@ interface SignupFormProps {
   onSwitchToLogin: () => void;
 }
 
-export default function SignupForm({ onSuccess, onSwitchToLogin }: SignupFormProps) {
+export default function SignupForm({ onSwitchToLogin }: SignupFormProps) {
     const router = useRouter(); 
   const [createUser, { loading: mutationLoading }] = useMutation(CREATE_USER);
   const [formData, setFormData] = useState({

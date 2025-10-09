@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
-import { Button, Input, Card, CardHeader, CardBody } from '../ui';
+import { Card, CardHeader, CardBody } from '../ui';
 import { LOGIN_USER } from '../../lib/graphql';
 import { useMutation } from '@apollo/client';
 import { STRINGS } from '../../constants/StringConstant';

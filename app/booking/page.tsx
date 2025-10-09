@@ -8,7 +8,6 @@ import {
   Card,
   CardBody,
   Button,
-  Skeleton,
   LoadingSpinner
 } from '../../components/ui';
 import BookingForm from '../../components/booking/BookingForm';
@@ -58,7 +57,6 @@ export default function BookingPage() {
     skip: !vehicleId,
   });
 
-  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [bookingData, setBookingData] = useState<BookingData | null>(null);
   const [currentStep, setCurrentStep] = useState<'booking' | 'payment'>('booking');
   

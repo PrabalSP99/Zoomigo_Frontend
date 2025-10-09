@@ -1,6 +1,7 @@
 'use client';
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { checkTokenAndHandleExpiration } from '../utils/tokenUtils';
 
 interface User {
   id: string;
@@ -29,7 +30,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Check for existing user session on app load
     const userData = localStorage.getItem('user');
     const token = localStorage.getItem('token');
-    if (userData) {
+    
+    if (userData && token) {
+      // Check if token is expired
+      if (!checkTokenAndHandleExpiration()) {
+        // Token is expired, user will be redirected
+        return;
+      }
+      
       try {
         setUser(JSON.parse(userData));
       } catch (error) {

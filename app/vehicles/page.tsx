@@ -12,7 +12,6 @@ import {
   Badge,
   Input,
   Select,
-  Skeleton,
   LoadingSpinner
 } from '../../components/ui';
 import Navbar from '../../components/ui/Navbar';
@@ -96,7 +95,7 @@ export default function AllVehiclesPage() {
     }
   });
 
-  const handleFilterChange = (key: keyof VehicleFilters, value: any) => {
+  const handleFilterChange = (key: keyof VehicleFilters, value: string | number | { min: number; max: number }) => {
     setFilters(prev => ({ ...prev, [key]: value }));
   };
 
@@ -130,9 +129,6 @@ export default function AllVehiclesPage() {
     }
   };
 
-  const getVehicleIcon = (type: string) => {
-    return type === 'CAR' ? '🚗' : '🏍️';
-  };
 
   if (authLoading || loading) {
     return (

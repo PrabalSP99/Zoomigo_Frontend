@@ -1,7 +1,7 @@
 'use client';
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { usePathname, useRouter } from 'next/navigation';
+import { createContext, useContext, useState, ReactNode } from 'react';
+import { useRouter } from 'next/navigation';
 
 interface PageTransitionContextType {
   isLoading: boolean;
@@ -14,8 +14,6 @@ const PageTransitionContext = createContext<PageTransitionContextType | undefine
 
 export function PageTransitionProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(false);
-  const pathname = usePathname();
-  const router = useRouter();
 
   const startTransition = () => {
     setIsLoading(true);

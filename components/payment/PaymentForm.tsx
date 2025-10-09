@@ -13,7 +13,6 @@ import {
   Badge,
   Modal
 } from '../ui';
-import { STRINGS } from '../../constants/StringConstant';
 import { CREATE_PAYMENT } from '../../lib/graphql';
 
 interface PaymentFormProps {
@@ -162,7 +161,7 @@ export default function PaymentForm({ bookingId, bookingData, onPaymentSuccess, 
       const transactionId = `TXN${Date.now()}${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
 
       // Prepare payment metadata based on selected method
-      const metadata: any = {};
+      const metadata: Record<string, string> = {};
       switch (selectedMethod) {
         case 'UPI':
           metadata.upiId = paymentData.upiId;

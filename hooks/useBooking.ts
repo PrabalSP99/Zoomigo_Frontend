@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useMutation } from '@apollo/client';
 import { CREATE_BOOKING } from '../lib/graphql';
+import { useTokenValidation } from './useTokenValidation';
 
 interface BookingInput {
   vehicleId: string;
@@ -36,29 +37,28 @@ interface BookingResult {
 export const useBooking = () => {
   const [createBooking, { loading, error }] = useMutation(CREATE_BOOKING);
   const [bookingResult, setBookingResult] = useState<BookingResult | null>(null);
+  const { executeWithTokenValidation } = useTokenValidation();
 
   const bookVehicle = async (input: BookingInput) => {
-    try {
-      // Debug: Check if token exists
-      const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-      console.log('useBooking - Token exists:', token ? 'Yes' : 'No');
-      console.log('useBooking - Booking input:', input);
-      
-      const { data } = await createBooking({
-        variables: { input },
-        context: {
-          headers: {
-            authorization: token ? `Bearer ${token}` : "",
-          }
-        }
-      });
-      
-      setBookingResult(data.createBooking);
-      return data.createBooking;
-    } catch (err) {
-      console.error('Booking error:', err);
-      throw err;
-    }
+    return executeWithTokenValidation(async () => {
+      try {
+        // Debug: Check if token exists
+        const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+        console.log('useBooking - Token exists:', token ? 'Yes' : 'No');
+        console.log('useBooking - Booking input:', input);
+        
+        const { data } = await createBooking({
+          variables: { input }
+          // Apollo client authLink handles authentication automatically
+        });
+        
+        setBookingResult(data.createBooking);
+        return data.createBooking;
+      } catch (err) {
+        console.error('Booking error:', err);
+        throw err;
+      }
+    });
   };
 
   const resetBooking = () => {

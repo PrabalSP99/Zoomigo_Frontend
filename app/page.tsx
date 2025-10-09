@@ -7,12 +7,6 @@ import CustomLink from '../components/CustomLink';
 import { useNavigationWithLoading } from '../contexts/PageTransitionContext';
 import { usePageTransition } from '../contexts/PageTransitionContext';
 import { 
-  Card, 
-  CardBody,
-  Button,
-  Badge,
-  Input,
-  Select,
   LoadingSpinner
 } from '../components/ui';
 import Navbar from '../components/ui/Navbar';
@@ -112,9 +106,6 @@ export default function Home() {
     setSearchFilters({ ...searchFilters, [type]: value });
   };
 
-  const handleGuestsChange = (value: string) => {
-    setSearchFilters({ ...searchFilters, guests: value });
-  };
 
   const handleQuickSearch = () => {
     // Navigate to search results with filters
@@ -127,7 +118,7 @@ export default function Home() {
   };
 
   if (featuredLoading) {
-    return (
+  return (
       <LoadingSpinner 
         isLoading={true} 
         message="Finding the perfect vehicles for you..." 
@@ -474,7 +465,7 @@ export default function Home() {
               Trust and safety
             </h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              We're here to help, day and night. Talk with our support team from anywhere in the world.
+              We&apos;re here to help, day and night. Talk with our support team from anywhere in the world.
             </p>
           </div>
 
@@ -487,7 +478,7 @@ export default function Home() {
               </div>
                 <h3 className="text-xl font-semibold mb-3">24/7 Support</h3>
               <p className="text-gray-600">
-                Get help anytime, anywhere. We're here to support you with any questions or issues.
+                Get help anytime, anywhere. We&apos;re here to support you with any questions or issues.
               </p>
             </div>
             <div className="text-center">

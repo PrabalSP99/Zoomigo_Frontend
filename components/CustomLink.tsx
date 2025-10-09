@@ -25,7 +25,7 @@ export default function CustomLink({
 }: CustomLinkProps) {
   const { startTransition } = usePageTransition();
 
-  const handleClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
+  const handleClick = () => {
     // Call the original onClick if provided
     if (onClick) {
       onClick();

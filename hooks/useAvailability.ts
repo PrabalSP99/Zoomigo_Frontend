@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useLazyQuery } from '@apollo/client';
 import { CHECK_AVAILABILITY } from '../lib/graphql';
 import { toast } from 'react-toastify';
+import { useTokenValidation } from './useTokenValidation';
 
 interface AvailabilityResult {
   available: boolean;
@@ -15,6 +16,7 @@ interface AvailabilityResult {
 export const useAvailability = () => {
   const [checkAvailability, { loading }] = useLazyQuery(CHECK_AVAILABILITY);
   const [isChecking, setIsChecking] = useState(false);
+  const { executeWithTokenValidation } = useTokenValidation();
 
   const checkVehicleAvailability = async (
     vehicleId: string,
@@ -22,9 +24,10 @@ export const useAvailability = () => {
     endTime: string,
     showToast: boolean = true
   ): Promise<boolean> => {
-    setIsChecking(true);
-    
-    try {
+    return executeWithTokenValidation(async () => {
+      setIsChecking(true);
+      
+      try {
       const { data } = await checkAvailability({
         variables: {
           vehicleId,
@@ -107,6 +110,7 @@ export const useAvailability = () => {
     } finally {
       setIsChecking(false);
     }
+    });
   };
 
   return {

@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { useQuery } from '@apollo/client';
 import { useAuth } from '../../contexts/AuthContext';
 import { usePageTransition } from '../../contexts/PageTransitionContext';
-import { Card, CardBody, Button, Badge, Skeleton, LoadingSpinner } from '../../components/ui';
+import { Card, CardBody, Button, Badge, LoadingSpinner } from '../../components/ui';
 import Navbar from '../../components/ui/Navbar';
 import { GET_BOOKINGS } from '../../lib/graphql';
 
