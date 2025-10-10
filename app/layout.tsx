@@ -51,7 +51,6 @@ export default function RootLayout({
                   theme="light"
                   className="custom-toast-container"
                   toastClassName="custom-toast"
-                  bodyClassName="custom-toast-body"
                   progressClassName="custom-toast-progress"
                 />
               </PageTransitionProvider>
