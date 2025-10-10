@@ -3,7 +3,7 @@
 import { useQuery } from '@apollo/client';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import {
   Card,
   CardBody,
@@ -45,7 +45,7 @@ interface PaymentData {
   status: 'SUCCESS' | 'FAILED' | 'PENDING';
 }
 
-export default function BookingPage() {
+function BookingPageContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const vehicleId = searchParams.get('vehicleId');
@@ -76,22 +76,13 @@ export default function BookingPage() {
     }
   }, [authLoading, loading, endTransition]);
 
-  // Debug: Check authentication status
-  useEffect(() => {
-    console.log('Booking Page - Auth Status:', {
-      user: user ? 'Logged in' : 'Not logged in',
-      authLoading,
-      token: typeof window !== 'undefined' ? localStorage.getItem('token') ? 'Token exists' : 'No token' : 'SSR'
-    });
-  }, [user, authLoading]);
 
   const handleBookingSubmit = (data: BookingData) => {
     setBookingData(data);
     setCurrentStep('payment');
   };
 
-  const handlePaymentSuccess = (paymentData: PaymentData) => {
-    console.log('Payment successful:', paymentData);
+  const handlePaymentSuccess = (_paymentData: PaymentData) => {
     // Use Next.js router for proper navigation without losing auth state
     router.push('/bookings');
   };
@@ -278,5 +269,20 @@ export default function BookingPage() {
         ) : null}
       </div>
     </div>
+  );
+}
+
+export default function BookingPage() {
+  return (
+    <Suspense fallback={
+      <LoadingSpinner 
+        isLoading={true} 
+        message="Loading booking page..." 
+        size="lg"
+        variant="car"
+      />
+    }>
+      <BookingPageContent />
+    </Suspense>
   );
 }

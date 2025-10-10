@@ -24,7 +24,7 @@ export const useAvailability = () => {
     endTime: string,
     showToast: boolean = true
   ): Promise<boolean> => {
-    return executeWithTokenValidation(async () => {
+    const result = await executeWithTokenValidation(async () => {
       setIsChecking(true);
       
       try {
@@ -111,6 +111,8 @@ export const useAvailability = () => {
       setIsChecking(false);
     }
     });
+    
+    return result ?? false;
   };
 
   return {

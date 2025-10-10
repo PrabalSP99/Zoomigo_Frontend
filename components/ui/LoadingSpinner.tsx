@@ -1,7 +1,5 @@
 'use client';
 
-import React from 'react';
-
 interface LoadingSpinnerProps {
   isLoading: boolean;
   message?: string;
@@ -26,6 +24,11 @@ export function InlineLoading({
   const textSizeClasses = {
     sm: 'text-xs',
     md: 'text-sm'
+  };
+
+  const sizeClasses = {
+    sm: 'w-8 h-8',
+    md: 'w-12 h-12'
   };
 
   return (
