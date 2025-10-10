@@ -3,10 +3,10 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useMutation } from '@apollo/client';
-import { 
-  Card, 
-  CardHeader, 
-  CardBody, 
+import {
+  Card,
+  CardHeader,
+  CardBody,
   CardFooter,
   Button,
   Input,
@@ -214,12 +214,17 @@ export default function PaymentForm({ bookingId, bookingData, onPaymentSuccess, 
 
       setShowSuccessModal(true);
       onPaymentSuccess(paymentResult);
-    } catch (error) {
-      console.error('Payment failed:', error);
-      setErrors({ general: error.message || 'Payment failed. Please try again.' });
+    } catch (err) {
+      console.error('Payment failed:', err);
+      if (err instanceof Error) {
+        setErrors({ general: err.message });
+      } else {
+        setErrors({ general: 'Payment failed. Please try again.' });
+      }
     } finally {
       setIsProcessing(false);
     }
+
   };
 
   const formatCardNumber = (value: string) => {
@@ -311,11 +316,10 @@ export default function PaymentForm({ bookingId, bookingData, onPaymentSuccess, 
                 <button
                   key={method.id}
                   onClick={() => setSelectedMethod(method.id)}
-                  className={`p-4 border-2 rounded-lg text-left transition-all ${
-                    selectedMethod === method.id
+                  className={`p-4 border-2 rounded-lg text-left transition-all ${selectedMethod === method.id
                       ? 'border-blue-500 bg-blue-50'
                       : 'border-gray-200 hover:border-gray-300'
-                  }`}
+                    }`}
                 >
                   <div className="flex items-center gap-3">
                     <span className="text-2xl">{method.icon}</span>
@@ -361,9 +365,9 @@ export default function PaymentForm({ bookingId, bookingData, onPaymentSuccess, 
                   label="Card Number"
                   placeholder="1234 5678 9012 3456"
                   value={paymentData.cardNumber}
-                  onChange={(e) => setPaymentData({ 
-                    ...paymentData, 
-                    cardNumber: formatCardNumber(e.target.value) 
+                  onChange={(e) => setPaymentData({
+                    ...paymentData,
+                    cardNumber: formatCardNumber(e.target.value)
                   })}
                   error={!!errors.cardNumber}
                   errorMessage={errors.cardNumber}
