@@ -4,7 +4,7 @@ import { onError } from '@apollo/client/link/error';
 import { checkTokenAndHandleExpiration, isTokenExpired } from '../utils/tokenUtils';
 
 const httpLink = createHttpLink({
-  uri: 'http://localhost:4004/graphql', // Update this to match your backend GraphQL endpoint
+  uri: process.env.NEXT_PUBLIC_API_URL, // Update this to match your backend GraphQL endpoint
 });
 
 const authLink = setContext((_, { headers }) => {

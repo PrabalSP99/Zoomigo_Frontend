@@ -5,6 +5,7 @@ const nextConfig: NextConfig = {
   images: {
     domains: ["plus.unsplash.com"], 
   },
+  output: 'standalone',
 };
 
 export default nextConfig;
