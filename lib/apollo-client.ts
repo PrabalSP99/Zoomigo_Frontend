@@ -4,7 +4,7 @@ import { onError } from '@apollo/client/link/error';
 import { checkTokenAndHandleExpiration, isTokenExpired } from '../utils/tokenUtils';
 
 const httpLink = createHttpLink({
-  uri: 'https://api.badhosa.com/graphql', // Change this line
+  uri: process.env.NEXT_PUBLIC_API_URL, // Change this line
 });
 
 const authLink = setContext((_, { headers }) => {
