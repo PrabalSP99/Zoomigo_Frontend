@@ -32,12 +32,14 @@ export default function Navbar() {
           {/* Navigation Items */}
           <div className="flex items-center space-x-2 sm:space-x-4 mr-2 sm:mr-4">
             {/* Become a host - Hidden on small screens */}
-            <CustomLink 
-              href="/host" 
+            <a 
+              href="https://host.badhosa.com" 
+              target="_blank"
+              rel="noopener noreferrer"
               className="hidden sm:block text-gray-600 hover:text-gray-900 transition-colors font-medium"
             >
               Become a host
-            </CustomLink>
+            </a>
             
             {/* Globe icon */}
             <button className="text-gray-600 hover:text-gray-900 transition-all duration-200 p-1 sm:p-2 rounded-full hover:bg-gray-200 hover:shadow-sm border border-gray-300 hover:border-white">
