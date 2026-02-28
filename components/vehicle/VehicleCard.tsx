@@ -8,8 +8,24 @@ interface VehicleCardProps {
   onSelect?: (vehicle: Vehicle) => void;
 }
 
+const carImageMap: Record<string, string> = {
+  'Slavia': '/cars/skoda.webp',
+  'Venue': '/cars/venue3.webp',
+  'Fronx': '/cars/Venue.webp',
+  'Innova Crysta': '/cars/innova.webp',
+  'Scorpio Classic': '/cars/Scorpio.webp',
+  'Creta': '/cars/venue2.webp',
+  'Vitara Brezza': '/cars/Venue.webp',
+  'Swift': '/cars/car1.webp',
+  'Verna': '/cars/car2.webp',
+  'XUV700': '/cars/car3.webp',
+  'Fortuner': '/cars/Fortuner.webp',
+  'Thar': '/cars/thar.webp',
+};
+
 export default function VehicleCard({ vehicle, onSelect }: VehicleCardProps) {
-  const primaryImage = vehicle.images.find(img => img.isPrimary) || vehicle.images[0];
+  const staticImage = carImageMap[vehicle.model];
+  const primaryImage = staticImage ? { url: staticImage, altText: `${vehicle.brand} ${vehicle.model}` } : (vehicle.images.find(img => img.isPrimary) || vehicle.images[0]);
   
   const getAvailabilityColor = (status: string) => {
     switch (status) {

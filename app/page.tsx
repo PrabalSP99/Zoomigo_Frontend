@@ -1,6 +1,5 @@
 'use client';
 
-import { useQuery } from '@apollo/client';
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import CustomLink from '../components/CustomLink';
@@ -11,10 +10,11 @@ import {
 } from '../components/ui';
 import Navbar from '../components/ui/Navbar';
 import { Vehicle } from '../types';
-import { GET_FEATURED_VEHICLES } from '../lib/graphql';
+import { getMockVehicles } from '../lib/mockVehicles';
 
 export default function Home() {
-  const { loading: featuredLoading, data: featuredData, error: featuredError } = useQuery(GET_FEATURED_VEHICLES);
+  const [featuredVehicles, setFeaturedVehicles] = useState<Vehicle[]>([]);
+  const [loading, setLoading] = useState(true);
   const { navigateWithLoading } = useNavigationWithLoading();
   const { endTransition } = usePageTransition();
   
@@ -32,14 +32,16 @@ export default function Home() {
   const [showGuestsDropdown, setShowGuestsDropdown] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
 
-  const featuredVehicles = featuredData?.vehicles || [];
-
-  // End loading transition when data is ready
+  // Load mock vehicles
   useEffect(() => {
-    if (!featuredLoading) {
+    setLoading(true);
+    setTimeout(() => {
+      const vehicles = getMockVehicles();
+      setFeaturedVehicles(vehicles.filter(v => v.featured));
+      setLoading(false);
       endTransition();
-    }
-  }, [featuredLoading, endTransition]);
+    }, 500);
+  }, [endTransition]);
 
   const popularCities = [
     { name: 'Mumbai', icon: '/Mumbai.svg' },
@@ -117,7 +119,7 @@ export default function Home() {
     navigateWithLoading(`/search?${params.toString()}`);
   };
 
-  if (featuredLoading) {
+  if (loading) {
   return (
       <LoadingSpinner 
         isLoading={true} 
@@ -408,26 +410,11 @@ export default function Home() {
             </svg>
           </div>
 
-          {featuredError ? (
-            <div className="text-center py-8">
-              <div className="text-red-600 text-lg font-medium mb-2">
-                Error loading vehicles
-              </div>
-              <p className="text-gray-600 mb-4">{featuredError.message}</p>
-              <button
-                onClick={() => window.location.reload()}
-                className="bg-indigo-900 text-white px-4 py-2 rounded-md hover:bg-indigo-800 transition-colors"
-              >
-                Try Again
-              </button>
-            </div>
-          ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6 mt-6">
-              {featuredVehicles.slice(0, 10).map((vehicle: Vehicle) => (
-                <FeaturedVehicleCard key={vehicle.id} vehicle={vehicle} />
-              ))}
-            </div>
-          )}
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6 mt-6">
+            {featuredVehicles.slice(0, 10).map((vehicle: Vehicle) => (
+              <FeaturedVehicleCard key={vehicle.id} vehicle={vehicle} />
+            ))}
+          </div>
         </div>
       </section>
 

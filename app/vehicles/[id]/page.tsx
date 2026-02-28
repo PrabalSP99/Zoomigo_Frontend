@@ -1,8 +1,8 @@
 'use client';
 
-import { useQuery } from '@apollo/client';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
+import { useState, useEffect } from 'react';
 import { 
   Card, 
   CardHeader, 
@@ -15,18 +15,23 @@ import {
 } from '@/components/ui';
 import Navbar from '@/components/ui/Navbar';
 import { Vehicle } from '@/types';
-import { GET_VEHICLE } from '@/lib/graphql';
+import { getMockVehicleById } from '@/lib/mockVehicles';
 
 
 export default function VehicleDetailsPage() {
   const params = useParams();
   const vehicleId = params.id as string;
-  const { loading, error, data } = useQuery(GET_VEHICLE, {
-    variables: { id: vehicleId },
-    skip: !vehicleId,
-  });
+  const [loading, setLoading] = useState(true);
+  const [vehicle, setVehicle] = useState<Vehicle | undefined>();
 
-  const vehicle: Vehicle = data?.vehicle;
+  useEffect(() => {
+    setLoading(true);
+    setTimeout(() => {
+      const foundVehicle = getMockVehicleById(vehicleId);
+      setVehicle(foundVehicle);
+      setLoading(false);
+    }, 300);
+  }, [vehicleId]);
 
   if (loading) {
     return (
@@ -41,26 +46,6 @@ export default function VehicleDetailsPage() {
             </div>
           </div>
         </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-screen bg-gradient-to-t from-gray-100 to-gray-50 flex items-center justify-center">
-        <Card className="max-w-md">
-          <CardBody>
-            <div className="text-center">
-              <h2 className="text-xl font-semibold text-red-600 mb-2">
-                Error Loading Vehicle
-              </h2>
-              <p className="text-gray-600 mb-4">{error.message}</p>
-              <Button onClick={() => window.history.back()} className="bg-gradient-to-r from-indigo-900 to-indigo-700 hover:from-indigo-800 hover:to-indigo-600 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-200 ease-in-out hover:scale-105 hover:shadow-lg">
-                Go Back
-              </Button>
-            </div>
-          </CardBody>
-        </Card>
       </div>
     );
   }

@@ -1,6 +1,5 @@
 'use client';
 
-import { useQuery } from '@apollo/client';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -16,7 +15,7 @@ import {
 } from '../../components/ui';
 import Navbar from '../../components/ui/Navbar';
 import { Vehicle } from '../../types';
-import { GET_VEHICLES } from '../../lib/graphql';
+import { getMockVehicles } from '../../lib/mockVehicles';
 import { useAuth } from '../../contexts/AuthContext';
 import { usePageTransition } from '../../contexts/PageTransitionContext';
 
@@ -36,6 +35,8 @@ export default function AllVehiclesPage() {
   const { endTransition } = usePageTransition();
   const [viewMode, setViewMode] = useState<'grid' | 'list' | 'table'>('grid');
   const [showFilters, setShowFilters] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [filters, setFilters] = useState<VehicleFilters>({
     type: 'ALL',
     brand: '',
@@ -47,9 +48,15 @@ export default function AllVehiclesPage() {
     sortBy: 'PRICE_LOW_TO_HIGH'
   });
 
-  const { loading, error, data } = useQuery(GET_VEHICLES);
-
-  const vehicles = data?.vehicles || [];
+  // Load mock vehicles
+  useEffect(() => {
+    setLoading(true);
+    setTimeout(() => {
+      setVehicles(getMockVehicles());
+      setLoading(false);
+      endTransition();
+    }, 300);
+  }, [endTransition]);
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -57,13 +64,6 @@ export default function AllVehiclesPage() {
       window.location.href = '/auth?redirect=/vehicles';
     }
   }, [user, authLoading]);
-
-  // End loading transition when data is ready
-  useEffect(() => {
-    if (!authLoading && !loading) {
-      endTransition();
-    }
-  }, [authLoading, loading, endTransition]);
 
   // Filter vehicles based on current filters
   const filteredVehicles = vehicles.filter((vehicle: Vehicle) => {
@@ -159,29 +159,6 @@ export default function AllVehiclesPage() {
             </div>
           </CardBody>
         </Card>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="min-h-screen bg-gradient-to-t from-gray-100 to-gray-50">
-        <Navbar />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <Card className="max-w-md mx-auto">
-            <CardBody>
-              <div className="text-center">
-                <h2 className="text-xl font-semibold text-red-600 mb-2">
-                  Error Loading Vehicles
-                </h2>
-                <p className="text-gray-600 mb-4">{error.message}</p>
-                <Button onClick={() => window.location.reload()} className="bg-gradient-to-r from-indigo-900 to-indigo-700 hover:from-indigo-800 hover:to-indigo-600 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-200 ease-in-out hover:scale-105 hover:shadow-lg">
-                  Try Again
-                </Button>
-              </div>
-            </CardBody>
-          </Card>
-        </div>
       </div>
     );
   }

@@ -1,10 +1,9 @@
 'use client';
 
-import { useQuery } from '@apollo/client';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useState, Suspense } from 'react';
+import { useState, Suspense, useEffect } from 'react';
 import {
   Card,
   CardHeader,
@@ -16,7 +15,7 @@ import {
 } from '../../components/ui';
 import Navbar from '../../components/ui/Navbar';
 import { Vehicle } from '../../types';
-import { GET_VEHICLES } from '../../lib/graphql';
+import { getMockVehicles } from '../../lib/mockVehicles';
 
 interface SearchFilters {
   location: string;
@@ -35,6 +34,8 @@ function SearchPageContent() {
   const searchParams = useSearchParams();
   const [viewMode, setViewMode] = useState<'grid' | 'list' | 'map'>('grid');
   const [showFilters, setShowFilters] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [filters, setFilters] = useState<SearchFilters>({
     location: searchParams.get('location') || '',
     vehicleType: searchParams.get('type') || 'ALL',
@@ -51,28 +52,48 @@ function SearchPageContent() {
     sortBy: 'PRICE_LOW_TO_HIGH'
   });
 
-  const { loading, error, data } = useQuery(GET_VEHICLES, {
-    variables: {
-      filters: {
-        type: filters.vehicleType === 'ALL' ? null : filters.vehicleType,
-        brand: filters.brand || null,
-        city: filters.location || null,
-        minPrice: filters.priceRange.min || null,
-        maxPrice: filters.priceRange.max || null,
-        fuelType: filters.fuelType || null,
-        driveMode: filters.driveMode || null,
-        seats: filters.seats || null,
-        availability: filters.startDate && filters.endDate ? {
-          startTime: filters.startDate,
-          endTime: filters.endDate
-        } : null,
-        sortBy: filters.sortBy || null,
-        first: 50
+  useEffect(() => {
+    setLoading(true);
+    setTimeout(() => {
+      let allVehicles = getMockVehicles();
+      
+      // Apply filters
+      if (filters.vehicleType !== 'ALL') {
+        allVehicles = allVehicles.filter(v => v.type === filters.vehicleType);
       }
-    }
-  });
-
-  const vehicles = data?.vehicles || [];
+      if (filters.brand) {
+        allVehicles = allVehicles.filter(v => v.brand.toLowerCase().includes(filters.brand.toLowerCase()));
+      }
+      if (filters.location) {
+        allVehicles = allVehicles.filter(v => v.location.city.toLowerCase().includes(filters.location.toLowerCase()));
+      }
+      if (filters.priceRange.min > 0) {
+        allVehicles = allVehicles.filter(v => v.pricing.perDay >= filters.priceRange.min);
+      }
+      if (filters.priceRange.max < 10000) {
+        allVehicles = allVehicles.filter(v => v.pricing.perDay <= filters.priceRange.max);
+      }
+      if (filters.fuelType) {
+        allVehicles = allVehicles.filter(v => v.engineSpec.fuelType.toLowerCase().includes(filters.fuelType.toLowerCase()));
+      }
+      if (filters.driveMode) {
+        allVehicles = allVehicles.filter(v => v.engineSpec.driveMode === filters.driveMode);
+      }
+      if (filters.seats > 0) {
+        allVehicles = allVehicles.filter(v => v.engineSpec.seats >= filters.seats);
+      }
+      
+      // Apply sorting
+      if (filters.sortBy === 'PRICE_LOW_TO_HIGH') {
+        allVehicles.sort((a, b) => a.pricing.perDay - b.pricing.perDay);
+      } else if (filters.sortBy === 'PRICE_HIGH_TO_LOW') {
+        allVehicles.sort((a, b) => b.pricing.perDay - a.pricing.perDay);
+      }
+      
+      setVehicles(allVehicles);
+      setLoading(false);
+    }, 300);
+  }, [filters]);
 
   const handleFilterChange = (key: keyof SearchFilters, value: string | number | { min: number; max: number }) => {
     setFilters(prev => ({ ...prev, [key]: value }));
@@ -388,20 +409,6 @@ function SearchPageContent() {
                   </Card>
                 ))}
               </div>
-            ) : error ? (
-              <Card>
-                <CardBody>
-                  <div className="text-center">
-                    <h3 className="text-lg font-semibold text-red-600 mb-2">
-                      Error Loading Vehicles
-                    </h3>
-                    <p className="text-gray-600 mb-4">{error.message}</p>
-                    <Button onClick={() => window.location.reload()} className="bg-gradient-to-r from-indigo-900 to-indigo-700 hover:from-indigo-800 hover:to-indigo-600 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-200 ease-in-out hover:scale-105 hover:shadow-lg">
-                      Try Again
-                    </Button>
-                  </div>
-                </CardBody>
-              </Card>
             ) : vehicles.length === 0 ? (
               <Card>
                 <CardBody>
