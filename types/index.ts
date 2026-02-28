@@ -31,6 +31,7 @@ export interface Vehicle {
     perKm?: number;
   };
   availabilityStatus: 'AVAILABLE' | 'UNAVAILABLE' | 'MAINTENANCE';
+  featured?: boolean;
   images: Array<{
     url: string;
     altText: string;
